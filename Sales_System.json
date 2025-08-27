@@ -1,0 +1,137 @@
+{
+  "name": "Sales System",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1MJEyRace4KdXBg5PwG6F8_ETSNK19y_ExYalj_R9yWM",
+          "mode": "list",
+          "cachedResultName": "Sales Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MJEyRace4KdXBg5PwG6F8_ETSNK19y_ExYalj_R9yWM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MJEyRace4KdXBg5PwG6F8_ETSNK19y_ExYalj_R9yWM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -660,
+        -120
+      ],
+      "id": "a34b5945-0240-4b96-a3e1-bc6059dcae57",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "DRn1xfeER2AYjluf",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyAQhILwV6ZQsmKvbbi5L3NibT26fn28Kh4",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-goog-api-key",
+              "value": "AIzaSyAQhILwV6ZQsmKvbbi5L3NibT26fn28Kh4"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Write a short, warm but professional cold email to {{$json.Name}}, owner of {{$json['Company Name']}}, about adding VR arcade machines. My company is RGS Arcade Solutions, a provider of high-quality VR arcade machines for Family Entertainment Centers (FECs). Our systems are designed for high throughput, intuitive gameplay, and minimal staff overhead while driving strong new revenue streams. Sign the email as: Durgesh Patel, Sales & Partnerships | RGS Arcade Solutions, Phone: +91 98765 43210, Website: www.rgsarcade.com. Make the email personalized, reference the FEC name, and keep it under 200 words. End with a clear but friendly call-to-action for a quick call or sharing more info.\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "options": {
+          "allowUnauthorizedCerts": false
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -440,
+        -120
+      ],
+      "id": "780b586b-fda8-40fc-a242-d9246c6009cf",
+      "name": "HTTP Request",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json.Email }}",
+        "subject": "=VR Machines for  {{ $('Google Sheets Trigger').item.json['Company Name'] }}",
+        "emailType": "text",
+        "message": "={{ $json.candidates[0].content.parts[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -220,
+        -120
+      ],
+      "id": "0f295dda-4e3e-433c-9edb-f5df558fae74",
+      "name": "Gmail",
+      "webhookId": "554f2d44-b53e-4fc3-b3de-0914c8d0f743",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LpPXUB6KcPTHnO3a",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2620fe6a-1aee-4718-bcc7-8806f5092ecc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab4300c080ea4aa4f0a45bee5038303cc15b47a44ef95bb5ffb67ba92543d8c4"
+  },
+  "id": "TA2sz1zEQS9smrTw",
+  "tags": []
+}
